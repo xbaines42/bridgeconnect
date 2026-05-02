@@ -152,9 +152,9 @@ http://localhost:8888/bridgeconnect
 
 ## Authors
 
-Xavier Baines 
-Kamari Johnson
-Christopher Crosby 
+-Xavier Baines 
+-Kamari Johnson
+-Christopher Crosby 
 
 
 ---
