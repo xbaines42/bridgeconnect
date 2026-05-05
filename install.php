@@ -1,43 +1,44 @@
 <?php
-$host = "localhost";
+$host = "127.0.0.1";
 $username = "root";
 $password = "root";
-$port = 3306;
+$database = "bridgeconnect";
+$port = 8889;
 
 $conn = new mysqli($host, $username, $password, "", $port);
 
 if ($conn->connect_error) {
-    die("MAMP MySQL Connection Failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error);
 }
 
+// Force create and select database first
+$conn->query("CREATE DATABASE IF NOT EXISTS `$database`");
+$conn->select_db($database);
+
+// Load setup.sql
 $sql = file_get_contents("setup.sql");
 
-if ($conn->multi_query($sql)) {
-    do {
-        if ($result = $conn->store_result()) {
-            $result->free();
-        }
-    } while ($conn->more_results() && $conn->next_result());
-} else {
-    die("Install error: " . $conn->error);
+// Remove phpMyAdmin comments
+$sql = preg_replace('/--.*(\r\n|\r|\n)/', '', $sql);
+
+// Remove CREATE DATABASE and USE lines because install.php handles that now
+$sql = preg_replace('/CREATE DATABASE.*?;/is', '', $sql);
+$sql = preg_replace('/USE\s+`?bridgeconnect`?\s*;/i', '', $sql);
+
+// Split and run queries
+$queries = array_filter(array_map('trim', explode(';', $sql)));
+
+foreach ($queries as $query) {
+    if ($query === '') {
+        continue;
+    }
+
+    if (!$conn->query($query)) {
+        die("<h2>Install Error</h2><p>" . $conn->error . "</p><pre>" . htmlspecialchars($query) . "</pre>");
+    }
 }
+
+echo "<h1>BridgeConnect Installed Successfully</h1>";
+echo "<p>Database and tables were created.</p>";
+echo "<a href='index.php'>Go to App</a>";
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>BridgeConnect Installed</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-<div class="page-bg">
-    <div class="container small">
-        <div class="form-card center">
-            <h1>BridgeConnect Installed</h1>
-            <p class="muted">Database, tables, demo users, and demo resources were created successfully.</p>
-            <a class="btn" href="index.php">Go to Homepage</a>
-            <a class="btn secondary" href="login.php">Go to Login</a>
-        </div>
-    </div>
-</div>
-</body>
-</html>
