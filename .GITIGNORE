@@ -1,0 +1,7 @@
+# Secret keys — never commit these
+.env
+
+# MAMP / local dev
+*.log
+.DS_Store
+Thumbs.db
