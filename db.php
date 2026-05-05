@@ -1,9 +1,9 @@
 <?php
-$host = "127.0.0.1";
+$host = "localhost";
 $username = "root";
 $password = "root";
 $database = "bridgeconnect";
-$port = 8889;
+$port = 3306;
 
 $conn = new mysqli($host, $username, $password, $database, $port);
 
